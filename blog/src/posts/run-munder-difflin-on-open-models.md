@@ -6,8 +6,6 @@ updated: 2026-09-10
 category: guides
 categoryLabel: Guides
 type: Technical
-pinned: true
-pinOrder: 3
 primaryKeyword: "run ai agents on open source models"
 secondaryKeywords: ["local llm coding agent", "ollama coding agent", "openrouter coding agent", "gpt-oss", "byok open models", "opencode crush pi", "pi models.json ollama"]
 tags: ["Guides", "Local-First", "Open Source", "CLI Agents", "Tutorial"]
@@ -78,6 +76,8 @@ expose it, often `:8000/v1`.
 ## How do you run a model fully locally?
 
 Pull a model, tell the engine where it lives, and pick it for an agent.
+
+Want a local model behind Claude Code itself? That route is covered in [how to connect Ollama to Claude Code](/blog/how-to-connect-ollama-to-claude-code/).
 
 **1. Pull a model.** With [Ollama](https://ollama.com) installed, grab one sized to your memory:
 
