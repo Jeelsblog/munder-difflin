@@ -119,7 +119,19 @@ export function EditAgentModal({ agent, onClose }: EditAgentModalProps) {
                 collapsing into a wide thin strip on a small form. */}
             <div style={{
               display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-              gap: 16, alignItems: 'start', minHeight: 260
+              gap: 16, alignItems: 'start', minHeight: 260,
+              // flexShrink MUST stay 0, and it is `minHeight` above that makes it
+              // load-bearing. This grid is a flex item in a `column` container
+              // that caps itself at 86vh. A flex item's automatic minimum size
+              // (`min-height: auto`) would normally refuse to shrink it below its
+              // content — but naming an explicit minHeight REPLACES that rule and
+              // licenses the item to shrink all the way to 260px. Once the model
+              // picker grew a live catalog (~390 entries), the column finally
+              // exceeded 86vh, the grid collapsed toward 260, and the left column
+              // spilled out of the squashed box and painted over the cancel/save
+              // row beneath it. The minHeight is still wanted, for the opposite
+              // case the comment above describes, so the two coexist.
+              flexShrink: 0
             }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14, minWidth: 0 }}>
             <Section label="Identity" hint="name · character · color">
@@ -269,7 +281,7 @@ export function EditAgentModal({ agent, onClose }: EditAgentModalProps) {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 4 }}>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 4, flexShrink: 0 }}>
               <PixelButton variant="ghost" size="md" onClick={onClose}>cancel</PixelButton>
               <div style={{ flex: 1 }} />
               <PixelButton variant="primary" size="md" onClick={save}>save changes</PixelButton>
