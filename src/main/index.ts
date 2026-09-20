@@ -2998,8 +2998,10 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
     // 2) Floor auto-state for pi's bundled extension auto-allow (guardrail #5): it
     //    only auto-approves tool calls when this is '1' (i.e. floor auto mode on).
     extra.HIVE_AUTO_APPROVE = cfg.autoMode ? '1' : '0';
-    // 3) OpenCode's auto-approve + local provider live in its single config-injection
-    //    env var, built dynamically so permission:allow is GATED on autoMode (#2).
+    // 3) OpenCode's config-file auto-approve + local provider live in its single
+    //    config-injection env var, built dynamically so permission:allow is GATED
+    //    on autoMode (#2). Belt-and-suspenders alongside the `--auto` CLI flag
+    //    (buildSpawnCommand / autoModeFlagForProvider), which is gated the same way.
     if (provider === 'opencode') {
       const oc: Record<string, unknown> = { autoupdate: false };
       if (cfg.autoMode) oc.permission = { edit: 'allow', bash: 'allow', webfetch: 'allow' };

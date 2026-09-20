@@ -353,14 +353,17 @@ export const AGENT_PROVIDER_PRESETS: AgentProviderPreset[] = [
     label: 'OpenCode',
     defaultCommand: 'opencode',
     commandGroups: [],
-    // OpenCode's TUI exposes no skip-permissions FLAG; headless auto-approve is a
-    // config concern (permission:allow). To keep auto-mode gated behind the floor
-    // `config.autoMode` toggle (Pam guardrail #2), the permission JSON is NOT a
-    // static nonInteractiveEnv — spawnAgentCore builds OPENCODE_CONFIG_CONTENT
-    // dynamically (permission:allow only when autoMode is on; + a local provider
-    // block when a base-URL is set). So no auto flag is spliced onto the command.
-    autoModeFlag: '',
-    autoFlag: '',
+    // OpenCode DOES expose a skip-permissions flag (`--auto`: auto-approve any
+    // permission request that isn't explicitly denied — see opencode.ai/docs/
+    // permissions). Wired through the same autoFlag/autoModeFlag mechanism every
+    // other provider uses, so it's spliced onto the command ONLY when the floor
+    // `config.autoMode` toggle is on (Pam guardrail #2) — off by default, same
+    // gate as Claude's bypassPermissions / Codex's dangerous bypass. The
+    // OPENCODE_CONFIG_CONTENT permission:allow injection below (spawnAgentCore)
+    // covers the same ground for the config-file path; --auto is the CLI-level
+    // equivalent so the TUI itself stops prompting.
+    autoModeFlag: '--auto',
+    autoFlag: '--auto',
     supportsModel: true,
     modelFlag: '--model', // value form: provider/model, e.g. anthropic/claude-sonnet-4-5
     hiveAware: false, // no --append-system-prompt/--settings; protocol rides in via --prompt
