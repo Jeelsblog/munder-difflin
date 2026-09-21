@@ -78,8 +78,11 @@ test('an explicit stance wins for non-claude providers too (no doubled flag)', (
 });
 
 test('a provider whose preset declares no auto flag gets nothing appended', () => {
-  assert.deepEqual(launch({ requestCommand: 'opencode', autoMode: true }).args, []);
   assert.deepEqual(launch({ requestCommand: 'my-own-tool', autoMode: true }).args, []);
+});
+
+test('OpenCode gets --auto appended for a worker with no stance', () => {
+  assert.deepEqual(launch({ requestCommand: 'opencode', autoMode: true }).args, ['--auto']);
 });
 
 test('a multi-token auto flag appends whole, and the stance check is by token', () => {

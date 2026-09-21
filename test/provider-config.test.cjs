@@ -81,6 +81,21 @@ test('provider commands use matching models and equivalent bypass modes', () => 
   );
 });
 
+test('OpenCode is the one provider where --auto comes BEFORE --model', () => {
+  // Confirmed live: `opencode --model X --auto` left permission prompts on;
+  // `opencode --auto --model X` auto-approved as expected. Every other
+  // provider keeps the default model-then-auto order (see test above).
+  assert.equal(
+    buildSpawnCommand(autoConfig, 'anthropic/claude-sonnet-4-5', 'opencode'),
+    'opencode --auto --model anthropic/claude-sonnet-4-5'
+  );
+  assert.equal(
+    buildSpawnCommand({ ...autoConfig, autoMode: false }, 'anthropic/claude-sonnet-4-5', 'opencode'),
+    'opencode --model anthropic/claude-sonnet-4-5',
+    'no --auto at all when the app auto-mode toggle is off'
+  );
+});
+
 test('model picker options stay provider-specific', () => {
   assert.equal(
     modelsForProvider('claude').find((model) => model.id === 'claude-opus-5')?.label,
