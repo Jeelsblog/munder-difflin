@@ -66,3 +66,21 @@ test('codex\'s multi-token auto flag is applied the same way as Claude\'s two-to
     ['--model', 'gpt-5.6-sol', '-a', 'never', '-s', 'workspace-write']
   );
 });
+
+test('an OpenCode agent persisted WITHOUT --auto picks the flag up on a later spawn', () => {
+  // The bug this guards: the renderer bakes the auto flag into the command string
+  // once, at Add-Agent time, and persists it on the agent. An agent created before
+  // autoMode was switched on replayed that flagless string on every restore, so it
+  // asked for permission on every app start and the user had to enable
+  // auto-approve by hand inside the TUI each session. spawnAgentCore now applies
+  // the CURRENT toggle to every provider, not just Claude.
+  assert.deepEqual(
+    argsWithAutoModeFlag(['--model', 'anthropic/claude-sonnet-4-5'], true, 'opencode'),
+    ['--model', 'anthropic/claude-sonnet-4-5', '--auto']
+  );
+});
+
+test('an OpenCode agent that already carries --auto is not given a second one', () => {
+  const born = ['--auto', '--model', 'anthropic/claude-sonnet-4-5'];
+  assert.deepEqual(argsWithAutoModeFlag(born, true, 'opencode'), born);
+});
