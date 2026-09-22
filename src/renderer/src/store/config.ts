@@ -450,9 +450,8 @@ export function buildSpawnCommand(
   const autoSegment = config.autoMode && preset.autoFlag ? ` ${preset.autoFlag}` : '';
   // Auto (skip-permissions) mode appends each provider's own flag — Claude's
   // bypassPermissions, Codex's dangerous bypass, Grok's always-approve, Kimi's
-  // auto, or agy's skip flag. OpenCode's `--auto` only reliably auto-approves
-  // when it comes BEFORE `--model` (confirmed against a live run — `--model X
-  // --auto` left it still prompting); every other provider keeps the
+  // auto, or agy's skip flag. A preset may ask for the flag BEFORE `--model`
+  // (OpenCode, to match buildWorkerLaunch's order); everything else keeps the
   // established model-then-auto order.
   if (preset.autoFlagBeforeModel) {
     cmd = `${cmd}${autoSegment}${modelSegment()}`;

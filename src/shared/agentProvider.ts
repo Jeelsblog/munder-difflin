@@ -80,10 +80,11 @@ export interface AgentProviderPreset {
    *  PR #54 consumers read this; mirrors `autoModeFlag`. */
   autoFlag?: string;
   /** When true, buildSpawnCommand splices `autoFlag` in BEFORE `--model`
-   *  instead of the default after-model position. Provider-specific: OpenCode's
-   *  `--auto` was confirmed (live run) to leave permission prompts on when
-   *  placed after `--model` — every other provider keeps the default order, so
-   *  this must stay opt-in per preset rather than a global reorder. */
+   *  instead of the default after-model position. Cosmetic for a yargs-style CLI
+   *  (OpenCode 1.18.x parses either order identically — verified); it exists so
+   *  OpenCode's line matches buildWorkerLaunch's auto-then-model order and the
+   *  two spawn paths read the same. Opt-in per preset: no other provider's line
+   *  changes. */
   autoFlagBeforeModel?: boolean;
   /** Claude Code accepts the hive identity injection (`--append-system-prompt`
    *  + hook `--settings`). Other CLIs don't — they spawn with the shared AGENT_*
@@ -370,9 +371,8 @@ export const AGENT_PROVIDER_PRESETS: AgentProviderPreset[] = [
     // equivalent so the TUI itself stops prompting.
     autoModeFlag: '--auto',
     autoFlag: '--auto',
-    // Confirmed live: `opencode --model X --auto` left permission prompts on;
-    // `opencode --auto --model X` auto-approved as expected. Provider-specific
-    // quirk — see autoFlagBeforeModel's doc comment.
+    // Emit `--auto` before `--model` so this line matches buildWorkerLaunch's
+    // order. Presentation only — see autoFlagBeforeModel's doc comment.
     autoFlagBeforeModel: true,
     supportsModel: true,
     modelFlag: '--model', // value form: provider/model, e.g. anthropic/claude-sonnet-4-5
