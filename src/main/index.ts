@@ -2890,6 +2890,20 @@ async function spawnAgentCore(opts: AgentSpawnOptions, owner: Electron.WebConten
       }
     }
     opts.args = args;
+  } else if (opts.hive) {
+    // Same posture for every NON-Claude engine. The renderer bakes autoMode's flag
+    // into the command STRING once, at Add-Agent time, and that string is PERSISTED
+    // on the agent — so a restored/respawned agent replays the posture it was BORN
+    // with. An OpenCode agent created before autoMode was on therefore kept asking
+    // for permission on every app start, and the only remedy was flipping
+    // auto-approve by hand inside the TUI, every session, forever. Applying the
+    // flag here instead means the CURRENT toggle wins at spawn, for every path
+    // (restore, respawn, GUI hire) the way it already does for Claude.
+    // argsWithAutoModeFlag is idempotent via hasAutoModeStance, so a freshly built
+    // command that already carries the flag is left exactly as-is — no duplicate.
+    // NOTE: like Claude's, this only ADDS when autoMode is on; it never strips a
+    // flag an agent already carries when the toggle is off.
+    opts.args = argsWithAutoModeFlag(opts.args ?? [], readConfig().autoMode, provider);
   }
   // Idempotent session resume on respawn (#6.6a) — provider-aware: Claude
   // `--resume <sid>`, Grok `--resume <sid>`, Antigravity `--conversation <id>`.

@@ -440,15 +440,23 @@ export function buildSpawnCommand(
         ? config.defaultCommand || ''
         : preset.defaultCommand;
   let cmd = base;
-  if (preset.supportsModel && model && preset.modelFlag) {
+  const modelSegment = (): string => {
+    if (!(preset.supportsModel && model && preset.modelFlag)) return '';
     // Quote model values that contain whitespace (agy labels like
     // "Gemini 3.1 Pro (High)") so the command tokenizer keeps them one arg.
     const m = /\s/.test(model) ? `"${model}"` : model;
-    cmd = `${cmd} ${preset.modelFlag} ${m}`;
-  }
+    return ` ${preset.modelFlag} ${m}`;
+  };
+  const autoSegment = config.autoMode && preset.autoFlag ? ` ${preset.autoFlag}` : '';
   // Auto (skip-permissions) mode appends each provider's own flag — Claude's
   // bypassPermissions, Codex's dangerous bypass, Grok's always-approve, Kimi's
-  // auto, or agy's skip flag.
-  if (config.autoMode && preset.autoFlag) cmd = `${cmd} ${preset.autoFlag}`;
+  // auto, or agy's skip flag. A preset may ask for the flag BEFORE `--model`
+  // (OpenCode, to match buildWorkerLaunch's order); everything else keeps the
+  // established model-then-auto order.
+  if (preset.autoFlagBeforeModel) {
+    cmd = `${cmd}${autoSegment}${modelSegment()}`;
+  } else {
+    cmd = `${cmd}${modelSegment()}${autoSegment}`;
+  }
   return cmd;
 }

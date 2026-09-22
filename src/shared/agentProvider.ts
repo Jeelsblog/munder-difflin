@@ -79,6 +79,13 @@ export interface AgentProviderPreset {
   /** Flag appended when the floor is in auto (skip-permissions) mode.
    *  PR #54 consumers read this; mirrors `autoModeFlag`. */
   autoFlag?: string;
+  /** When true, buildSpawnCommand splices `autoFlag` in BEFORE `--model`
+   *  instead of the default after-model position. Cosmetic for a yargs-style CLI
+   *  (OpenCode 1.18.x parses either order identically — verified); it exists so
+   *  OpenCode's line matches buildWorkerLaunch's auto-then-model order and the
+   *  two spawn paths read the same. Opt-in per preset: no other provider's line
+   *  changes. */
+  autoFlagBeforeModel?: boolean;
   /** Claude Code accepts the hive identity injection (`--append-system-prompt`
    *  + hook `--settings`). Other CLIs don't — they spawn with the shared AGENT_*
    *  env only. Gates the Claude-specific spawn injection in hive.ensureAgent.
@@ -364,6 +371,9 @@ export const AGENT_PROVIDER_PRESETS: AgentProviderPreset[] = [
     // equivalent so the TUI itself stops prompting.
     autoModeFlag: '--auto',
     autoFlag: '--auto',
+    // Emit `--auto` before `--model` so this line matches buildWorkerLaunch's
+    // order. Presentation only — see autoFlagBeforeModel's doc comment.
+    autoFlagBeforeModel: true,
     supportsModel: true,
     modelFlag: '--model', // value form: provider/model, e.g. anthropic/claude-sonnet-4-5
     hiveAware: false, // no --append-system-prompt/--settings; protocol rides in via --prompt
